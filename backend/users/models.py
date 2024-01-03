@@ -11,7 +11,7 @@ class User(AbstractUser):
 
 class Subscription(models.Model):
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='user'
+        User, on_delete=models.CASCADE, related_name='subscribed_user'
     )
     subscription = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name='subscriptions'
@@ -30,4 +30,4 @@ class Subscription(models.Model):
         )
 
     def __str__(self):
-        return self.user
+        return self.subscription

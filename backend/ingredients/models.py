@@ -6,7 +6,7 @@ class Ingredient(models.Model):
         max_length=200, unique=True , verbose_name='название'
     )
     measurement_unit = models.CharField(
-        max_length=10, verbose_name='единицы измерения'
+        max_length=200, verbose_name='единицы измерения'
     )
 
     def __str__(self):
