@@ -16,12 +16,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'rest_framework.authtoken',
     'djoser',
-    'users.apps.UsersConfig',
     'ingredients.apps.IngredientsConfig',
     'tags.apps.TagsConfig',
+    'users.apps.UsersConfig',
     'recipes.apps.RecipesConfig',
+    'api.apps.ApiConfig',
 ]
 
 MIDDLEWARE = [
@@ -91,3 +91,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+MIN_INGREDIENT_AMOUNT = 1
+
+MIN_COOKING_TIME = 1

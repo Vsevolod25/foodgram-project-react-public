@@ -11,10 +11,16 @@ class User(AbstractUser):
 
 class Subscription(models.Model):
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='subscribed_user'
+        User,
+        on_delete=models.CASCADE,
+        related_name='subscribed_user',
+        verbose_name='пользователь'
     )
     subscription = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='subscriptions'
+        User,
+        on_delete=models.CASCADE,
+        related_name='subscriptions',
+        verbose_name='подписка'
     )
 
     class Meta:
