@@ -6,7 +6,7 @@ from ingredients.models import Ingredient
 from recipes.models import Favorite, Recipe, RecipeIngredient, ShoppingCart
 from tags.models import Tag
 from users.models import Subscription, User
-from .category_check_functions import (
+from .supporting_functions import (
     favorite_check, shopping_cart_check, subscription_check
 )
 
@@ -45,11 +45,33 @@ class SubscriptionSerializer(serializers.ModelSerializer):
             ),
         )
 
-    def validate_following(self, value):
+    def validate_subscription(self, value):
         request = self.context['request']
         if value == request.user:
             raise serializers.ValidationError('Нельзя подписываться на себя.')
         return value
+    
+    def to_representation(self, instance):
+        subscription_recipes = Recipe.objects.filter(author=instance.subscription)
+        representation = {
+            'email': instance.subscription.email,
+            'id': instance.subscription.id,
+            'username': instance.subscription.username,
+            'first_name': instance.subscription.first_name,
+            'last_name': instance.subscription.last_name,
+            'is_subscribed': True,
+            'recipes': [
+                {
+                    'id': current_recipe.id,
+                    'name': current_recipe.name,
+                    'image': current_recipe.image,
+                    'cooking_time': current_recipe.cooking_time
+                } for current_recipe in subscription_recipes
+            ],
+            'recipe_count': subscription_recipes.count()
+        }
+
+        return representation
 
 
 class RecipeSerializer(serializers.ModelSerializer):
