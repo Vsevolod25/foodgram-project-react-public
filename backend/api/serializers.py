@@ -1,3 +1,4 @@
+from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 from rest_framework.validators import UniqueTogetherValidator
@@ -9,6 +10,27 @@ from users.models import Subscription, User
 from .supporting_functions import (
     favorite_check, shopping_cart_check, subscription_check
 )
+
+
+class UserSignUpSerializer(UserCreateSerializer):
+
+    class Meta:
+        model = User
+        fields = ('email', 'username', 'first_name', 'last_name', 'password',)
+
+
+class UserDisplaySerializer(UserSerializer):
+    is_subscribed = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = (
+            'email', 'id', 'username',
+            'first_name', 'last_name', 'is_subscribed',
+        )
+
+    def get_is_subscribed(self, obj):
+        return subscription_check(self.request.user, self.instance)
 
 
 class IngredientSerializer(serializers.ModelSerializer):

@@ -1,26 +1,44 @@
-from django.shortcuts import get_object_or_404
-from django_filters.rest_framework import DjangoFilterBackend
+from djoser.views import UserViewSet
 from rest_framework import mixins, filters, viewsets, status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from ingredients.models import Ingredient
-from recipes.models import Favorite, Recipe, RecipeIngredient, RecipeTag, ShoppingCart
+from recipes.models import Recipe
 from tags.models import Tag
-from users.models import Subscription, User
-from .mixins import (
-    CreateDestroyViewSet, ListCreateDestroyViewSet, ListRetrieveViewSet
-)
+from users.models import User
+from .mixins import CreateDestroyViewSet, ListRetrieveViewSet
 from .serializers import (
     IngredientSerializer,
     FavoriteSerializer,
     RecipeSerializer,
     ShoppingCartSerializer,
     SubscriptionSerializer,
-    TagSerializer
+    TagSerializer,
+    UserDisplaySerializer,
+    UserSignUpSerializer
 )
 from .supporting_functions import get_recipe, get_user
+
+
+class MeViewSet(UserViewSet):
+    serializer_class = UserDisplaySerializer
+    http_method_names = ('get', 'head')
+
+    def get_queryset(self):
+        return self.request.user
+
+
+class UsersViewSet(UserViewSet):
+    queryset = User.objects.all()
+    http_method_names = ('get', 'head', 'post')
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return UserSignUpSerializer
+        else:
+            return UserDisplaySerializer
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
