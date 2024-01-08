@@ -39,7 +39,7 @@ router_v1.register(
 )
 
 urlpatterns = [
-    path('v1/', include(router_v1.urls)),
-    path('v1/auth/token/login', TokenCreateView.as_view(), name='login'),
-    path('v1/auth/token/logout', TokenDestroyView.as_view(), name='logout'),
+    path('', include(router_v1.urls)),
+    path('auth/token/login/', TokenCreateView.as_view(), name='login'),
+    path('auth/token/logout/', TokenDestroyView.as_view(), name='logout'),
 ]

@@ -15,6 +15,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework.authtoken',
     'rest_framework',
     'djoser',
     'ingredients.apps.IngredientsConfig',
@@ -49,7 +50,7 @@ REST_FRAMEWORK = {
 }
 
 DJOSER = {
-    'LOGIN_FIELD': 'User.EMAIL_FIELD',
+    'LOGIN_FIELD': 'email',
 }
 
 TEMPLATES = [

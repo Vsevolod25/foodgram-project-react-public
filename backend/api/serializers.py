@@ -1,7 +1,8 @@
+from django.core.validators import RegexValidator
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
-from rest_framework.validators import UniqueTogetherValidator
+from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
 
 from ingredients.models import Ingredient
 from recipes.models import Favorite, Recipe, RecipeIngredient, ShoppingCart
@@ -13,10 +14,30 @@ from .supporting_functions import (
 
 
 class UserSignUpSerializer(UserCreateSerializer):
+    email = serializers.CharField(
+        max_length=254,
+        validators=[UniqueValidator(queryset=User.objects.all())]
+    )
+    username = serializers.CharField(
+        max_length=150,
+        validators=[
+            RegexValidator(r'^[\w.@+-]+$'),
+            UniqueValidator(queryset=User.objects.all())
+        ]
+    )
 
     class Meta:
         model = User
         fields = ('email', 'username', 'first_name', 'last_name', 'password',)
+        extra_kwargs = {field:{'required': True} for field in fields}
+
+    def to_representation(self, instance):
+        representation = super(
+            UserCreateSerializer, self
+        ).to_representation(instance)
+        representation['id'] = instance.id
+
+        return representation
 
 
 class UserDisplaySerializer(UserSerializer):
