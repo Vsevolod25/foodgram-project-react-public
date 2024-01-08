@@ -1,5 +1,5 @@
 from django.core.validators import RegexValidator
-from djoser.serializers import UserCreateSerializer, UserSerializer
+from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
@@ -40,7 +40,7 @@ class UserSignUpSerializer(UserCreateSerializer):
         return representation
 
 
-class UserDisplaySerializer(UserSerializer):
+class UserDisplaySerializer(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
@@ -51,7 +51,10 @@ class UserDisplaySerializer(UserSerializer):
         )
 
     def get_is_subscribed(self, obj):
-        return subscription_check(self.request.user, self.instance)
+        request = self.context.get('request')
+        pk = request.parser_context.get('kwargs').get('pk')
+        user_id = request.user.id
+        return subscription_check(user_id, pk)
 
 
 class IngredientSerializer(serializers.ModelSerializer):

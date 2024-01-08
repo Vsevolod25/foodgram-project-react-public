@@ -11,7 +11,7 @@ class Recipe(models.Model):
     name = models.CharField(
         max_length=200, unique=True, verbose_name='название'
     )
-    image = models.ImageField(verbose_name='картинка')
+    image = models.TextField(verbose_name='картинка')
     text = models.TextField(verbose_name='текст')
     cooking_time = models.IntegerField(
         validators=[MinValueValidator(MIN_COOKING_TIME)],

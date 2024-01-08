@@ -9,6 +9,7 @@ from .views import (
     MeViewSet,
     UsersViewSet,
     RecipeViewSet,
+    SetPasswordViewSet,
     ShoppingCartViewSet,
     SubscriptionViewSet,
     TagViewSet
@@ -16,12 +17,13 @@ from .views import (
 
 router_v1 = DefaultRouter()
 
-router_v1.register('users', UsersViewSet, basename='users')
+router_v1.register('users/set_password', SetPasswordViewSet, basename='set_password')
 router_v1.register('users/me', MeViewSet, basename='me')
 router_v1.register(
     'users/subscriptions', AllSubscriptionsViewSet,
     basename='all_subscriptions'
 )
+router_v1.register('users', UsersViewSet, basename='users')
 router_v1.register(
     r'users/(?P<user_id>\d+)/subscribe',
     SubscriptionViewSet, basename='subscribe'

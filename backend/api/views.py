@@ -1,7 +1,10 @@
+from djoser.serializers import SetPasswordSerializer
 from djoser.views import UserViewSet
 from rest_framework import mixins, filters, viewsets, status
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.pagination import (
+    LimitOffsetPagination, PageNumberPagination
+)
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from ingredients.models import Ingredient
@@ -22,17 +25,27 @@ from .serializers import (
 from .supporting_functions import get_recipe, get_user
 
 
-class MeViewSet(UserViewSet):
+class SetPasswordViewSet(UserViewSet):
+    serializer_class = SetPasswordSerializer
+
+
+class MeViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
     serializer_class = UserDisplaySerializer
     http_method_names = ('get', 'head')
+    permission_classes = (IsAuthenticated,)
 
-    def get_queryset(self):
-        return self.request.user
+    def list(self, request):
+        instance = request.user
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
 
-class UsersViewSet(UserViewSet):
+class UsersViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
+    serializer_class = UserDisplaySerializer
     http_method_names = ('get', 'head', 'post')
+    pagination_class = LimitOffsetPagination
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
