@@ -49,7 +49,7 @@ class Recipe(models.Model):
 
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(
-        Recipe, on_delete=models.SET_NULL, null=True
+        Recipe, on_delete=models.CASCADE, null=True
     )
     ingredient = models.ForeignKey(
         Ingredient, on_delete=models.SET_NULL, null=True
@@ -61,7 +61,7 @@ class RecipeIngredient(models.Model):
 
 class RecipeTag(models.Model):
     recipe = models.ForeignKey(
-        Recipe, on_delete=models.SET_NULL, null=True
+        Recipe, on_delete=models.CASCADE, null=True
     )
     tag = models.ForeignKey(
         Tag, on_delete=models.SET_NULL, null=True
