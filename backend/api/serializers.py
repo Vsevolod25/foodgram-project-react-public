@@ -1,6 +1,8 @@
+from base64 import b64decode
+from django.core.files.base import ContentFile
 from django.core.validators import RegexValidator
-from djoser.serializers import UserCreateSerializer
 from django.shortcuts import get_object_or_404
+from djoser.serializers import UserCreateSerializer
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
@@ -108,6 +110,18 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         }
 
 
+class Base64ImageField(serializers.ImageField):
+
+    def to_internal_value(self, data):
+        if isinstance(data, str) and data.startswith('data:image'):
+            format, imgstr = data.split(';base64,')
+            ext = format.split('/')[-1]
+
+            data = ContentFile(b64decode(imgstr), name='temp.' + ext)
+
+        return super().to_internal_value(data)
+
+
 class RecipeSerializer(serializers.ModelSerializer):
     tags = serializers.ListField(required=True, write_only=True)
     author = serializers.SlugRelatedField(
@@ -115,6 +129,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         default=serializers.CurrentUserDefault()
     )
     ingredients = serializers.ListField(required=True, write_only=True)
+    image = Base64ImageField()
 
     class Meta:
         model = Recipe

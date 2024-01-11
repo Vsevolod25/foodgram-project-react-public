@@ -10,7 +10,7 @@ class UserAdmin(admin.ModelAdmin):
         'is_staff', 'is_active', 'last_login', 'date_joined'
     )
     search_fields = ('username', 'email', 'first_name', 'last_name')
-    list_filter = ('is_staff', 'is_active',)
+    list_filter = ('username', 'email', 'is_staff', 'is_active')
     empty_value_display = '-пусто-'
 
 
