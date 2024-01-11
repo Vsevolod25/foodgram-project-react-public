@@ -29,8 +29,8 @@ ERRORS_NOT_EXISTS_DICT = {
 
 def add_recipe_to_category_validation(self, model):
     user = self.request.user
-    if Recipe.objects.filter(pk=self.kwargs.get('recipe_id')).exists():
-        obj = Recipe.objects.get(pk=self.kwargs.get('recipe_id'))
+    if Recipe.objects.filter(pk=self.kwargs.get('pk')).exists():
+        obj = Recipe.objects.get(pk=self.kwargs.get('pk'))
     else:
         raise ValidationError('Указанного рецепта не существует.')
     if model.objects.filter(

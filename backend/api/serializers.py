@@ -64,20 +64,6 @@ class UserDisplaySerializer(serializers.ModelSerializer):
         return representation
 
 
-class IngredientSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Ingredient
-        fields = '__all__'
-
-
-class TagSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = Tag
-        fields = '__all__'
-
-
 class SubscriptionSerializer(serializers.ModelSerializer):
     user = serializers.SlugRelatedField(
         slug_field='username', queryset=User.objects.all(),
@@ -320,3 +306,17 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
             'image': instance.shopping_cart.image,
             'cooking_time': instance.shopping_cart.cooking_time
         }
+
+
+class IngredientSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Ingredient
+        fields = '__all__'
+
+
+class TagSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Tag
+        fields = '__all__'
