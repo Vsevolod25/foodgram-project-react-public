@@ -1,4 +1,5 @@
-from base64 import b64decode, b64encode
+from base64 import b64decode
+
 from django.core.files.base import ContentFile
 from django.core.validators import RegexValidator
 from django.shortcuts import get_object_or_404
@@ -64,18 +65,6 @@ class UserDisplaySerializer(serializers.ModelSerializer):
         representation['is_subscribed'] = is_subscribed
 
         return representation
-
-
-#class Base64ImageField(serializers.ImageField):
-
-    #def to_internal_value(self, data):
-        if isinstance(data, str) and data.startswith('data:image'):
-            format, imgstr = data.split(';base64,')
-            ext = format.split('/')[-1]
-
-            data = ContentFile(b64decode(imgstr), name='image.' + ext)
-
-        return super().to_internal_value(data)
 
 
 class SubscriptionSerializer(serializers.ModelSerializer):
@@ -232,7 +221,7 @@ class RecipeSerializer(serializers.ModelSerializer):
     def to_internal_value(self, data):
         try:
             image = data['image']
-        except:
+        except KeyError:
             return super().to_internal_value(data)
         if isinstance(image, str) and image.startswith('data:image'):
             format, imgstr = image.split(';base64,')

@@ -1,7 +1,5 @@
-from io import BytesIO
-
-from django.shortcuts import get_object_or_404
 from django.http import FileResponse
+from django.shortcuts import get_object_or_404
 from djoser.serializers import SetPasswordSerializer
 from rest_framework.exceptions import ValidationError
 from rest_framework.decorators import action
@@ -140,14 +138,14 @@ class RecipeViewSet(ModelViewSet):
                     id__in=get_many_to_many_list(request, ShoppingCart)
                 )
         return queryset
-    
+
     def get_serializer_class(self):
         if self.action == 'favorite':
             return FavoriteSerializer
         if self.action in ('shopping_cart', 'download_shopping_cart'):
             return ShoppingCartSerializer
         return RecipeSerializer
-    
+
     def get_permissions(self):
         if self.action in (
             'favorite', 'shopping_cart', 'download_shopping_cart'
@@ -179,20 +177,25 @@ class RecipeViewSet(ModelViewSet):
         ingredients = {}
         for recipe in shopping_cart_recipes:
             for ingredient in recipe.ingredients.all():
-                amount = RecipeIngredient.objects.get(recipe=recipe, ingredient=ingredient).amount
+                amount = RecipeIngredient.objects.get(
+                    recipe=recipe, ingredient=ingredient
+                ).amount
                 name_unit = f'{ingredient.name},{ingredient.measurement_unit}'
                 if name_unit not in ingredients.keys():
                     ingredients[name_unit] = amount
                 else:
                     ingredients[name_unit] += amount
-        
+
         with open(
             f'static/shopping_carts/{request.user}_shopping_cart.txt', 'w'
         ) as f:
             f.write('Список ингредиентов: \n')
             for ingredient in ingredients.keys():
                 name_unit = ingredient.split(',')
-                row = f'{name_unit[0]}: {ingredients[ingredient]} {name_unit[1]} \n'
+                row = (
+                    f'{name_unit[0]}: {ingredients[ingredient]} '
+                    f'{name_unit[1]} \n'
+                )
                 f.write(row)
         return f'static/shopping_carts/{request.user}_shopping_cart.txt'
 

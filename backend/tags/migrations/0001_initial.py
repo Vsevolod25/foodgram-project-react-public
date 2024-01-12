@@ -14,10 +14,21 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Tag',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=200, unique=True, verbose_name='название')),
-                ('color', models.CharField(max_length=7, verbose_name='цвет')),
-                ('slug', models.SlugField(max_length=200, unique=True, verbose_name='слаг')),
+                ('id', models.BigAutoField(
+                    auto_created=True,
+                    primary_key=True,
+                    serialize=False,
+                    verbose_name='ID'
+                )),
+                ('name', models.CharField(
+                    max_length=200, unique=True, verbose_name='название'
+                )),
+                ('color', models.CharField(
+                    max_length=7, verbose_name='цвет'
+                )),
+                ('slug', models.SlugField(
+                    max_length=200, unique=True, verbose_name='слаг'
+                )),
             ],
         ),
     ]

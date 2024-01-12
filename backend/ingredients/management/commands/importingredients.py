@@ -6,6 +6,7 @@ from django.core.management.base import BaseCommand
 
 from backend.settings import STATIC_URL
 
+
 class Command(BaseCommand):
     help = 'Импортирует данные об ингредиентах из .csv файла.'
 
@@ -25,8 +26,8 @@ class Command(BaseCommand):
                 id += 1
 
         cur.executemany(
-           f'INSERT INTO ingredients_ingredient (id, name, measurement_unit) '
-           f'VALUES (?, ?, ?);', db
+           'INSERT INTO ingredients_ingredient (id, name, measurement_unit) '
+           'VALUES (?, ?, ?);', db
         )
 
         con.commit()

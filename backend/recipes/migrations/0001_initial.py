@@ -16,40 +16,85 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Favorite',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(
+                    auto_created=True,
+                    primary_key=True,
+                    serialize=False,
+                    verbose_name='ID'
+                )),
             ],
         ),
         migrations.CreateModel(
             name='Recipe',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=200, unique=True, verbose_name='название')),
-                ('image', models.ImageField(upload_to='', verbose_name='картинка')),
+                ('id', models.BigAutoField(
+                    auto_created=True,
+                    primary_key=True,
+                    serialize=False,
+                    verbose_name='ID'
+                )),
+                ('name', models.CharField(
+                    max_length=200, unique=True, verbose_name='название'
+                )),
+                ('image', models.ImageField(
+                    upload_to='', verbose_name='картинка'
+                )),
                 ('text', models.TextField(verbose_name='текст')),
-                ('cooking_time', models.IntegerField(validators=[django.core.validators.MinValueValidator(1)], verbose_name='время приготовления')),
-                ('is_favorited', models.BooleanField(default=False, verbose_name='в избранном')),
-                ('is_in_shopping_cart', models.BooleanField(default=False, verbose_name='в корзине')),
-                ('pub_date', models.DateTimeField(auto_now_add=True, verbose_name='дата публикации')),
+                ('cooking_time', models.IntegerField(
+                    validators=[django.core.validators.MinValueValidator(1)],
+                    verbose_name='время приготовления'
+                )),
+                ('is_favorited', models.BooleanField(
+                    default=False, verbose_name='в избранном'
+                )),
+                ('is_in_shopping_cart', models.BooleanField(
+                    default=False, verbose_name='в корзине'
+                )),
+                ('pub_date', models.DateTimeField(
+                    auto_now_add=True, verbose_name='дата публикации'
+                )),
             ],
         ),
         migrations.CreateModel(
             name='RecipeIngredient',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('amount', models.IntegerField(default=1, validators=[django.core.validators.MinValueValidator(1)])),
+                ('id', models.BigAutoField(
+                    auto_created=True,
+                    primary_key=True,
+                    serialize=False,
+                    verbose_name='ID'
+                )),
+                ('amount', models.IntegerField(
+                    default=1,
+                    validators=[django.core.validators.MinValueValidator(1)]
+                )),
             ],
         ),
         migrations.CreateModel(
             name='RecipeTag',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.BigAutoField(
+                    auto_created=True,
+                    primary_key=True,
+                    serialize=False,
+                    verbose_name='ID'
+                )),
             ],
         ),
         migrations.CreateModel(
             name='ShoppingCart',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('shopping_cart', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='shopping_cart', to='recipes.recipe')),
+                ('id', models.BigAutoField(
+                    auto_created=True,
+                    primary_key=True,
+                    serialize=False,
+                    verbose_name='ID'
+                )),
+                ('shopping_cart', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE,
+                    related_name='shopping_cart',
+                    to='recipes.recipe'
+                )),
             ],
         ),
     ]
