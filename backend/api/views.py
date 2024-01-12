@@ -1,4 +1,7 @@
+from io import BytesIO
+
 from django.shortcuts import get_object_or_404
+from django.http import FileResponse
 from djoser.serializers import SetPasswordSerializer
 from rest_framework.exceptions import ValidationError
 from rest_framework.decorators import action
@@ -9,7 +12,7 @@ from rest_framework.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
 from rest_framework.viewsets import ModelViewSet
 
 from ingredients.models import Ingredient
-from recipes.models import Favorite, Recipe, ShoppingCart
+from recipes.models import Favorite, Recipe, RecipeIngredient, ShoppingCart
 from tags.models import Tag
 from users.models import Subscription, User
 from .functions import (
@@ -112,7 +115,7 @@ class RecipeViewSet(ModelViewSet):
     def get_queryset(self):
         if self.action == 'favorite':
             return Favorite.objects.all()
-        if self.action == 'shopping_cart':
+        if self.action in ('shopping_cart', 'download_shopping_cart'):
             return ShoppingCart.objects.all()
         queryset = Recipe.objects.all()
         author = self.request.query_params.get('author')
@@ -141,12 +144,14 @@ class RecipeViewSet(ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'favorite':
             return FavoriteSerializer
-        if self.action == 'shopping_cart':
+        if self.action in ('shopping_cart', 'download_shopping_cart'):
             return ShoppingCartSerializer
         return RecipeSerializer
     
     def get_permissions(self):
-        if self.action in ('favorite', 'shopping_cart'):
+        if self.action in (
+            'favorite', 'shopping_cart', 'download_shopping_cart'
+        ):
             self.permission_classes = (IsAuthenticated,)
         else:
             self.permission_classes = (IsAuthorOrReadOnly,)
@@ -163,6 +168,33 @@ class RecipeViewSet(ModelViewSet):
             tags=self.request.data['tags'],
             ingredients=self.request.data['ingredients']
         )
+
+    def create_shopping_cart_txt(self, request):
+        shopping_cart_recipes = [
+            Recipe.objects.get(id=id) for id in get_many_to_many_list(
+                request, ShoppingCart
+            )
+        ]
+
+        ingredients = {}
+        for recipe in shopping_cart_recipes:
+            for ingredient in recipe.ingredients.all():
+                amount = RecipeIngredient.objects.get(recipe=recipe, ingredient=ingredient).amount
+                name_unit = f'{ingredient.name},{ingredient.measurement_unit}'
+                if name_unit not in ingredients.keys():
+                    ingredients[name_unit] = amount
+                else:
+                    ingredients[name_unit] += amount
+        
+        with open(
+            f'static/shopping_carts/{request.user}_shopping_cart.txt', 'w'
+        ) as f:
+            f.write('Список ингредиентов: \n')
+            for ingredient in ingredients.keys():
+                name_unit = ingredient.split(',')
+                row = f'{name_unit[0]}: {ingredients[ingredient]} {name_unit[1]} \n'
+                f.write(row)
+        return f'static/shopping_carts/{request.user}_shopping_cart.txt'
 
     @action(['post', 'delete'], detail=True)
     def favorite(self, request, pk):
@@ -187,6 +219,11 @@ class RecipeViewSet(ModelViewSet):
         instance = get_many_to_many_instance(request, pk, ShoppingCart)
         instance.delete()
         return Response(status=HTTP_204_NO_CONTENT)
+
+    @action(['get'], detail=False)
+    def download_shopping_cart(self, request):
+        shopping_cart = self.create_shopping_cart_txt(request)
+        return FileResponse(open(shopping_cart, 'rb'))
 
 
 class IngredientViewSet(ListRetrieveViewSet):

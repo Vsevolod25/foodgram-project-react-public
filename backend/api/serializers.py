@@ -1,4 +1,4 @@
-from base64 import b64decode
+from base64 import b64decode, b64encode
 from django.core.files.base import ContentFile
 from django.core.validators import RegexValidator
 from django.shortcuts import get_object_or_404
@@ -66,6 +66,18 @@ class UserDisplaySerializer(serializers.ModelSerializer):
         return representation
 
 
+#class Base64ImageField(serializers.ImageField):
+
+    #def to_internal_value(self, data):
+        if isinstance(data, str) and data.startswith('data:image'):
+            format, imgstr = data.split(';base64,')
+            ext = format.split('/')[-1]
+
+            data = ContentFile(b64decode(imgstr), name='image.' + ext)
+
+        return super().to_internal_value(data)
+
+
 class SubscriptionSerializer(serializers.ModelSerializer):
     user = serializers.SlugRelatedField(
         slug_field='username', queryset=User.objects.all(),
@@ -102,24 +114,12 @@ class SubscriptionSerializer(serializers.ModelSerializer):
                 {
                     'id': current_recipe.id,
                     'name': current_recipe.name,
-                    'image': current_recipe.image,
+                    'image': str(current_recipe.image),
                     'cooking_time': current_recipe.cooking_time
                 } for current_recipe in subscription_recipes
             ],
             'recipes_count': recipes_count
         }
-
-
-class Base64ImageField(serializers.ImageField):
-
-    def to_internal_value(self, data):
-        if isinstance(data, str) and data.startswith('data:image'):
-            format, imgstr = data.split(';base64,')
-            ext = format.split('/')[-1]
-
-            data = ContentFile(b64decode(imgstr), name='temp.' + ext)
-
-        return super().to_internal_value(data)
 
 
 class RecipeSerializer(serializers.ModelSerializer):
@@ -129,7 +129,6 @@ class RecipeSerializer(serializers.ModelSerializer):
         default=serializers.CurrentUserDefault()
     )
     ingredients = serializers.ListField(required=True, write_only=True)
-    image = Base64ImageField()
 
     class Meta:
         model = Recipe
@@ -183,7 +182,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         for field in fields:
             if field not in attrs:
                 raise serializers.ValidationError(
-                    'Отсутствует обязательное поле.'
+                    f'Отсутствует обязательное поле - {field}.'
                 )
         return super().validate(attrs)
 
@@ -229,6 +228,19 @@ class RecipeSerializer(serializers.ModelSerializer):
                     'Количество не может быть меньше 1.'
                 )
         return value
+
+    def to_internal_value(self, data):
+        try:
+            image = data['image']
+        except:
+            return super().to_internal_value(data)
+        if isinstance(image, str) and image.startswith('data:image'):
+            format, imgstr = image.split(';base64,')
+            ext = format.split('/')[-1]
+            image = ContentFile(b64decode(imgstr), name='image.' + ext)
+            data['image'] = image
+
+        return super().to_internal_value(data)
 
     def to_representation(self, instance):
         representation = super(
@@ -294,7 +306,7 @@ class FavoriteSerializer(serializers.ModelSerializer):
         return {
             'id': instance.favorite.id,
             'name': instance.favorite.name,
-            'image': instance.favorite.image,
+            'image': str(instance.favorite.image),
             'cooking_time': instance.favorite.cooking_time
         }
 
@@ -318,7 +330,7 @@ class ShoppingCartSerializer(serializers.ModelSerializer):
         return {
             'id': instance.shopping_cart.id,
             'name': instance.shopping_cart.name,
-            'image': instance.shopping_cart.image,
+            'image': str(instance.shopping_cart.image),
             'cooking_time': instance.shopping_cart.cooking_time
         }
 

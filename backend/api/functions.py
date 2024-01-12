@@ -1,7 +1,4 @@
-from io import BytesIO
-
 from django.forms.models import model_to_dict
-from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import ValidationError
 
@@ -38,18 +35,6 @@ def add_recipe_to_category_validation(self, model):
     ).exists():
         raise ValidationError('Нельзя повторно добавлять рецепт в корзину.')
     return obj
-
-
-def create_shopping_cart_txt():
-    return ''
-
-
-def download_shopping_cart():
-    buffer = BytesIO()
-    shopping_cart = create_shopping_cart_txt()
-    shopping_cart.save(buffer)
-    buffer.seek(0)
-    return FileResponse(buffer, as_attachment=True, filename=f'shopping_cart.txt')
 
 
 def get_many_to_many_instance(request, pk, model):
