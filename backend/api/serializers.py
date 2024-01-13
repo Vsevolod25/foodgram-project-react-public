@@ -178,8 +178,8 @@ class RecipeSerializer(serializers.ModelSerializer):
     def validate_tags(self, value):
         if not value:
             raise serializers.ValidationError(
-                    'Необходимо указать теги.'
-                )
+                'Необходимо указать теги.'
+            )
         tags = []
         for tag in value:
             if tag in tags:
@@ -194,8 +194,8 @@ class RecipeSerializer(serializers.ModelSerializer):
     def validate_ingredients(self, value):
         if not value:
             raise serializers.ValidationError(
-                    'Необходимо указать ингредиенты.'
-                )
+                'Необходимо указать ингредиенты.'
+            )
         ingredients = []
         for ingredient in value:
             for key in ('id', 'amount'):

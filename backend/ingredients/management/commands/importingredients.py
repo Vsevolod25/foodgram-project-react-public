@@ -26,8 +26,8 @@ class Command(BaseCommand):
                 id += 1
 
         cur.executemany(
-           'INSERT INTO ingredients_ingredient (id, name, measurement_unit) '
-           'VALUES (?, ?, ?);', db
+            'INSERT INTO ingredients_ingredient (id, name, measurement_unit) '
+            'VALUES (?, ?, ?);', db
         )
 
         con.commit()
