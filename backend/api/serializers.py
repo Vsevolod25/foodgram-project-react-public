@@ -81,6 +81,14 @@ class SubscriptionSerializer(serializers.ModelSerializer):
     def get_subscription(self, obj):
         user_id = self.context['view'].kwargs['user_id']
         return get_object_or_404(User, id=user_id)
+    
+    def decode_image(self, image):
+        image = str(image)
+        if isinstance(image, str) and image.startswith('data:image'):
+            format, imgstr = image.split(';base64,')
+            ext = format.split('/')[-1]
+            image = ContentFile(b64decode(imgstr), name='image.' + ext)
+        return image
 
     def to_representation(self, instance):
         request = self.context['request']
@@ -103,7 +111,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
                 {
                     'id': current_recipe.id,
                     'name': current_recipe.name,
-                    'image': str(current_recipe.image),
+                    'image': self.decode_image(current_recipe.image),
                     'cooking_time': current_recipe.cooking_time
                 } for current_recipe in subscription_recipes
             ],

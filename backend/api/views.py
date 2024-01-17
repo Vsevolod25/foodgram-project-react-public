@@ -1,6 +1,5 @@
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
-from django_filters.rest_framework import DjangoFilterBackend
 from djoser.serializers import SetPasswordSerializer
 from rest_framework.exceptions import ValidationError
 from rest_framework.decorators import action
@@ -14,7 +13,6 @@ from ingredients.models import Ingredient
 from recipes.models import Favorite, Recipe, RecipeIngredient, ShoppingCart
 from tags.models import Tag
 from users.models import Subscription, User
-from .filters import RecipeFilters
 from .functions import (
     add_recipe_to_category_validation,
     get_many_to_many_instance,
@@ -109,8 +107,6 @@ class UsersViewSet(ModelViewSet):
 
 class RecipeViewSet(ModelViewSet):
     http_method_names = ('get', 'head', 'post', 'patch', 'delete')
-    filter_backends = (DjangoFilterBackend,)
-    filterset_class = RecipeFilters
     order_by = ('pub_date', 'name')
     pagination_class = LimitOffsetPagination
 
@@ -119,7 +115,34 @@ class RecipeViewSet(ModelViewSet):
             return Favorite.objects.all()
         if self.action in ('shopping_cart', 'download_shopping_cart'):
             return ShoppingCart.objects.all()
-        return Recipe.objects.all()
+        queryset = Recipe.objects.all()
+        tag_slugs = self.request.GET.getlist('tags')
+        tags = [Tag.objects.get(slug=slug).id for slug in tag_slugs]
+        author = self.request.query_params.get('author')
+        if author is not None:
+            if tags:
+               return queryset.filter(author=author, tags__in=tags)
+            return queryset.filter(author=author)
+        request = self.request
+        if request.user.is_authenticated:
+            is_favorited = self.request.query_params.get('is_favorited')
+            if is_favorited is not None:
+                if tags:
+                    return queryset.filter(
+                        id__in=get_many_to_many_list(request, Favorite),
+                        tags__in=tags
+                    )
+                return queryset.filter(
+                    id__in=get_many_to_many_list(request, Favorite)
+                )
+            is_in_shopping_cart = self.request.query_params.get(
+                'is_in_shopping_cart'
+            )
+            if is_in_shopping_cart is not None:
+                return queryset.filter(
+                    id__in=get_many_to_many_list(request, ShoppingCart)
+                )
+        return queryset
 
     def get_serializer_class(self):
         if self.action == 'favorite':

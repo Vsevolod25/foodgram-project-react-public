@@ -20,7 +20,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework.authtoken',
     'rest_framework',
-    'django_filters',
     'djoser',
     'ingredients.apps.IngredientsConfig',
     'tags.apps.TagsConfig',
