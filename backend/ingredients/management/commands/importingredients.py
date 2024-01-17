@@ -1,22 +1,25 @@
 import csv
 import os
-import sqlite3
 
+from psycopg2 import connect
 from django.core.management.base import BaseCommand
-
-from backend.settings import STATIC_URL
 
 
 class Command(BaseCommand):
     help = 'Импортирует данные об ингредиентах из .csv файла.'
 
     def handle(self, *args, **options):
-        path = os.path.join(STATIC_URL[1:], 'data/')
 
-        con = sqlite3.connect('db.sqlite3')
+        con = connect(
+            f'dbname={os.getenv("POSTGRES_DB")} '
+            f'user={os.getenv("POSTGRES_USER")} '
+            f'password={os.getenv("POSTGRES_PASSWORD")} '
+            f'host={os.getenv("DB_HOST")} '
+            f'port={os.getenv("DB_PORT")}'
+        )
         cur = con.cursor()
 
-        with open(f'{path}ingredients.csv', 'r') as csvfile:
+        with open('data/ingredients.csv', 'r') as csvfile:
             reader = csv.DictReader(csvfile)
             db = []
             id = 1
@@ -27,10 +30,11 @@ class Command(BaseCommand):
 
         cur.executemany(
             'INSERT INTO ingredients_ingredient (id, name, measurement_unit) '
-            'VALUES (?, ?, ?);', db
+            'VALUES (%s, %s, %s);', db
         )
 
         con.commit()
+        cur.close()
         con.close()
 
         print('Ингредиенты успешно импортированы.')
