@@ -16,7 +16,7 @@ services:
       - pg_data:/var/lib/postgresql/data
 
   backend:
-    build: ../backend
+    image: vsevolod25/foodgram_backend
     env_file: .env
     depends_on:
       - db
@@ -25,7 +25,7 @@ services:
       - media:/app/media/
 
   frontend:
-    build: ../frontend
+    image: vsevolod25/foodgram_frontend
     volumes:
       - ../frontend/:/app/result_build/
 
