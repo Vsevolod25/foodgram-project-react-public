@@ -186,7 +186,7 @@ class RecipeViewSet(ModelViewSet):
                     ingredients[name_unit] += amount
 
         with open(
-            f'static/shopping_carts/{request.user}_shopping_cart.txt', 'w'
+            f'data/{request.user}_shopping_cart.txt', 'w'
         ) as f:
             f.write('Список ингредиентов: \n')
             for ingredient in ingredients.keys():
@@ -196,7 +196,7 @@ class RecipeViewSet(ModelViewSet):
                     f'{name_unit[1]} \n'
                 )
                 f.write(row)
-        return f'static/shopping_carts/{request.user}_shopping_cart.txt'
+        return f'data/{request.user}_shopping_cart.txt'
 
     @action(['post', 'delete'], detail=True)
     def favorite(self, request, pk):
