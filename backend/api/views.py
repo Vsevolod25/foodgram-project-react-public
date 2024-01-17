@@ -107,7 +107,6 @@ class UsersViewSet(ModelViewSet):
 
 class RecipeViewSet(ModelViewSet):
     http_method_names = ('get', 'head', 'post', 'patch', 'delete')
-    order_by = ('-pub_date', 'name')
     pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
@@ -137,7 +136,7 @@ class RecipeViewSet(ModelViewSet):
         if tag_slugs:
             tags = [Tag.objects.get(slug=slug).id for slug in tag_slugs]
             queryset = queryset.filter(tags__in=tags).distinct()
-        return queryset
+        return queryset.order_by('-pub_date', 'name')
 
     def get_serializer_class(self):
         if self.action == 'favorite':
