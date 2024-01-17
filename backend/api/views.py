@@ -107,7 +107,7 @@ class UsersViewSet(ModelViewSet):
 
 class RecipeViewSet(ModelViewSet):
     http_method_names = ('get', 'head', 'post', 'patch', 'delete')
-    order_by = ('pub_date', 'name')
+    order_by = ('-pub_date', 'name')
     pagination_class = LimitOffsetPagination
 
     def get_queryset(self):
@@ -116,25 +116,8 @@ class RecipeViewSet(ModelViewSet):
         if self.action in ('shopping_cart', 'download_shopping_cart'):
             return ShoppingCart.objects.all()
         queryset = Recipe.objects.all()
-        tag_slugs = self.request.GET.getlist('tags')
-        tags = [Tag.objects.get(slug=slug).id for slug in tag_slugs]
-        author = self.request.query_params.get('author')
-        if author is not None:
-            if tags:
-               return queryset.filter(author=author, tags__in=tags)
-            return queryset.filter(author=author)
         request = self.request
         if request.user.is_authenticated:
-            is_favorited = self.request.query_params.get('is_favorited')
-            if is_favorited is not None:
-                if tags:
-                    return queryset.filter(
-                        id__in=get_many_to_many_list(request, Favorite),
-                        tags__in=tags
-                    )
-                return queryset.filter(
-                    id__in=get_many_to_many_list(request, Favorite)
-                )
             is_in_shopping_cart = self.request.query_params.get(
                 'is_in_shopping_cart'
             )
@@ -142,6 +125,18 @@ class RecipeViewSet(ModelViewSet):
                 return queryset.filter(
                     id__in=get_many_to_many_list(request, ShoppingCart)
                 )
+            is_favorited = self.request.query_params.get('is_favorited')
+            if is_favorited is not None:
+                queryset = queryset.filter(
+                    id__in=get_many_to_many_list(request, Favorite)
+                )
+        author = self.request.query_params.get('author')
+        if author is not None:
+            queryset = queryset.filter(author=author)
+        tag_slugs = self.request.GET.getlist('tags')
+        if tag_slugs:
+            tags = [Tag.objects.get(slug=slug).id for slug in tag_slugs]
+            queryset = queryset.filter(tags__in=tags).distinct()
         return queryset
 
     def get_serializer_class(self):
