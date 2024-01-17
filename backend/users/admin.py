@@ -14,7 +14,4 @@ class UserAdmin(admin.ModelAdmin):
     empty_value_display = '-пусто-'
 
 
-@admin.register(Subscription)
-class SubscriptionAdmin(admin.ModelAdmin):
-    list_display = ('subscription',)
-    search_fields = ('subscription__username',)
+admin.site.register(Subscription)

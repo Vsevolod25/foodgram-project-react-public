@@ -21,17 +21,7 @@ class RecipeAdmin(admin.ModelAdmin):
     favorited_num.short_description = 'Добавлено в избранное'
 
 
-@admin.register(Favorite)
-class FavoriteAdmin(admin.ModelAdmin):
-    list_display = ('favorite',)
-    search_fields = ('favorite__name',)
-
-
-@admin.register(ShoppingCart)
-class ShoppingCartAdmin(admin.ModelAdmin):
-    list_display = ('shopping_cart',)
-    search_fields = ('shopping_cart__name',)
-
-
+admin.site.register(Favorite)
+admin.site.register(ShoppingCart)
 admin.site.register(RecipeIngredient)
 admin.site.register(RecipeTag)
