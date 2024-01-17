@@ -123,46 +123,38 @@ class RecipeSerializer(serializers.ModelSerializer):
         model = Recipe
         exclude = ('pub_date',)
 
+    def get_tags_for_recipe(self, tags, recipe):
+        for tag in tags:
+            RecipeTag.objects.create(
+                recipe=recipe,
+                tag=Tag.objects.get(id=tag)
+            )
+
+    def get_ingredients_for_recipe(self, ingredients, recipe):
+        for ingredient in ingredients:
+            RecipeIngredient.objects.create(
+                recipe=recipe,
+                ingredient=Ingredient.objects.get(id=ingredient['id']),
+                amount=ingredient['amount']
+            )
+
     def create(self, validated_data):
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
         recipe = Recipe.objects.create(**validated_data)
-        for tag in tags:
-            RecipeTag.objects.create(
-                recipe=recipe,
-                tag=Tag.objects.get(id=tag)
-            )
-        for ingredient in ingredients:
-            RecipeIngredient.objects.create(
-                recipe=recipe,
-                ingredient=Ingredient.objects.get(id=ingredient['id']),
-                amount=ingredient['amount']
-            )
+        self.get_tags_for_recipe(tags, recipe)
+        self.get_ingredients_for_recipe(ingredients, recipe)
         return recipe
 
-    def update(self, instance, validated_data):
+    def update(self, recipe, validated_data):
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
-        instance.name = validated_data.get('name', instance.name)
-        instance.image = validated_data.get('image', instance.image)
-        instance.text = validated_data.get('text', instance.text)
-        instance.cooking_time = validated_data.get(
-            'cooking_time', instance.cooking_time
-        )
-        RecipeTag.objects.filter(recipe=instance).delete()
-        RecipeIngredient.objects.filter(recipe=instance).delete()
-        for tag in tags:
-            RecipeTag.objects.create(
-                recipe=instance,
-                tag=Tag.objects.get(id=tag)
-            )
-        for ingredient in ingredients:
-            RecipeIngredient.objects.create(
-                recipe=instance,
-                ingredient=Ingredient.objects.get(id=ingredient['id']),
-                amount=ingredient['amount']
-            )
-        return instance
+        recipe.super().update(recipe, validated_data)
+        RecipeTag.objects.filter(recipe=recipe).delete()
+        RecipeIngredient.objects.filter(recipe=recipe).delete()
+        self.get_tags_for_recipe(tags, recipe)
+        self.get_ingredients_for_recipe(ingredients, recipe)
+        return recipe
 
     def validate(self, attrs):
         fields = (
