@@ -45,7 +45,7 @@ class Recipe(models.Model):
 
     def __str__(self):
         return self.name
-    
+
     def favorited_num(self):
         return Favorite.objects.filter(favorite=self).count()
 
