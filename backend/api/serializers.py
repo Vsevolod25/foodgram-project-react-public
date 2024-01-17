@@ -212,6 +212,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     'Указанный ингредиент не найден.'
                 )
+            ingredient['amount'] = int(ingredient['amount'])
             if ingredient['amount'] < 1:
                 raise serializers.ValidationError(
                     'Количество не может быть меньше 1.'
