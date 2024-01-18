@@ -8,12 +8,12 @@ from .models import (
 
 
 class IngredientInline(admin.TabularInline):
-    model = Ingredient
+    model = Recipe.ingredients.through
     min_num = 1
 
 
 class TagInline(admin.TabularInline):
-    model = Tag
+    model = Recipe.tags.through
     min_num = 1
 
 

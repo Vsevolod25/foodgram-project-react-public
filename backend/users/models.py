@@ -9,37 +9,30 @@ class User(AbstractUser):
     email = models.EmailField(
         max_length=254,
         unique=True,
-        verbose_name='адрес электронной почты',
-        verbose_name_plural='адреса электронной почты'
+        verbose_name='адрес электронной почты'
     )
     username = models.CharField(
         max_length=MAX_USERNAME_LENGTH,
         unique=True,
-        validators=(
-            RegexValidator(
-                r'^[\w.@+-]+\z',
-                message='Имя пользователя содержит неразрешенные символы.'
-            ),
-        ),
-        verbose_name='имя пользователя',
-        verbose_name_plural='имена пользователей'
+        validators=(RegexValidator(r'^[\w.@+-]+\z'),),
+        verbose_name='имя пользователя'
     )
     first_name = models.CharField(
         max_length=MAX_USERNAME_LENGTH,
-        verbose_name='имя',
-        verbose_name_plural='имена'
+        verbose_name='имя'
     )
     last_name = models.CharField(
         max_length=MAX_USERNAME_LENGTH,
-        verbose_name='фамилия',
-        verbose_name_plural='фамилии'
+        verbose_name='фамилия'
     )
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['email', 'username', 'first_name', 'last_name']
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     class Meta:
-        ordering = ('-date_joined')
+        ordering = ('-date_joined',)
+        verbose_name='Пользователь'
+        verbose_name_plural='Пользователи'
 
     def __str__(self):
         return self.username
@@ -50,15 +43,13 @@ class Subscription(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='subscribed_user',
-        verbose_name='пользователь',
-        verbose_name_plural='пользователи'
+        verbose_name='пользователь'
     )
     subscription = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         related_name='subscriptions',
-        verbose_name='подписка',
-        verbose_name_plural='подписки'
+        verbose_name='подписка'
     )
 
     class Meta:
@@ -72,7 +63,9 @@ class Subscription(models.Model):
                 check=~models.Q(user=models.F('subscription'))
             )
         )
-        ordering = ('subscription')
+        ordering = ('subscription',)
+        verbose_name='Подписка'
+        verbose_name_plural='Подписки'
 
     def __str__(self):
         return self.subscription

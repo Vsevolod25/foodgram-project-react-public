@@ -8,24 +8,23 @@ class Tag(models.Model):
     name = models.CharField(
         max_length=MAX_FIELD_LENGTH,
         unique=True,
-        verbose_name='название',
-        verbose_name_plural='названия'
+        verbose_name='название'
     )
     color = ColorField(
         max_length=7,
         unique=True,
-        verbose_name='цвет',
-        verbose_name_plural='цвета'
+        verbose_name='цвет'
     )
     slug = models.SlugField(
         max_length=MAX_FIELD_LENGTH,
         unique=True,
-        verbose_name='слаг',
-        verbose_name_plural='слаги'
+        verbose_name='слаг'
     )
 
     class Meta:
         ordering = ('name',)
+        verbose_name='Тег'
+        verbose_name_plural='Теги'
 
     def __str__(self):
         return self.name

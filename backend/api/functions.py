@@ -24,19 +24,6 @@ ERRORS_NOT_EXISTS_DICT = {
 }
 
 
-def add_recipe_to_category_validation(self, model):
-    user = self.request.user
-    if Recipe.objects.filter(pk=self.kwargs.get('pk')).exists():
-        obj = Recipe.objects.get(pk=self.kwargs.get('pk'))
-    else:
-        raise ValidationError('Указанного рецепта не существует.')
-    if model.objects.filter(
-        **{'user': user, MODELS_FIELDS_DICT[model]: obj}
-    ).exists():
-        raise ValidationError('Нельзя повторно добавлять рецепт в корзину.')
-    return obj
-
-
 def get_many_to_many_instance(request, pk, model):
     user = request.user
     obj = get_object_or_404(MODELS_DEPENDENCY_DICT[model], pk=pk)
