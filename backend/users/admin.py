@@ -1,10 +1,11 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
 
 from .models import User, Subscription
 
 
 @admin.register(User)
-class UserAdmin(admin.ModelAdmin):
+class UserAdmin(UserAdmin):
     list_display = (
         'username', 'email', 'first_name', 'last_name',
         'is_staff', 'is_active', 'last_login', 'date_joined'
