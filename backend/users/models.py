@@ -31,8 +31,8 @@ class User(AbstractUser):
 
     class Meta:
         ordering = ('-date_joined',)
-        verbose_name='Пользователь'
-        verbose_name_plural='Пользователи'
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
 
     def __str__(self):
         return self.username
@@ -64,8 +64,8 @@ class Subscription(models.Model):
             )
         )
         ordering = ('subscription',)
-        verbose_name='Подписка'
-        verbose_name_plural='Подписки'
+        verbose_name = 'Подписка'
+        verbose_name_plural = 'Подписки'
 
     def __str__(self):
         return self.subscription

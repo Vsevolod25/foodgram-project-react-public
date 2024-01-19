@@ -56,8 +56,8 @@ class Recipe(models.Model):
 
     class Meta:
         ordering = ('-pub_date', 'name',)
-        verbose_name='Рецепт'
-        verbose_name_plural='Рецепты'
+        verbose_name = 'Рецепт'
+        verbose_name_plural = 'Рецепты'
 
     def __str__(self):
         return self.name
@@ -96,8 +96,8 @@ class RecipeIngredient(models.Model):
 
     class Meta:
         ordering = ('recipe',)
-        verbose_name='Ингредиент в рецепте'
-        verbose_name_plural='Ингредиенты в рецептах'
+        verbose_name = 'Ингредиент в рецепте'
+        verbose_name_plural = 'Ингредиенты в рецептах'
 
     def __str__(self):
         return self.recipe
@@ -119,8 +119,8 @@ class RecipeTag(models.Model):
 
     class Meta:
         ordering = ('recipe',)
-        verbose_name='Тег рецепта'
-        verbose_name_plural='Теги рецептов'
+        verbose_name = 'Тег рецепта'
+        verbose_name_plural = 'Теги рецептов'
 
     def __str__(self):
         return self.recipe
@@ -148,8 +148,8 @@ class Favorite(models.Model):
             ),
         )
         ordering = ('favorite',)
-        verbose_name='Избранный рецепт'
-        verbose_name_plural='Избранные рецепты'
+        verbose_name = 'Избранный рецепт'
+        verbose_name_plural = 'Избранные рецепты'
 
     def __str__(self):
         return self.favorite
@@ -177,8 +177,8 @@ class ShoppingCart(models.Model):
             ),
         )
         ordering = ('user',)
-        verbose_name='Рецепт в корзине'
-        verbose_name_plural='Рецепты в корзинах'
+        verbose_name = 'Рецепт в корзине'
+        verbose_name_plural = 'Рецепты в корзинах'
 
     def __str__(self):
         return self.shopping_cart
