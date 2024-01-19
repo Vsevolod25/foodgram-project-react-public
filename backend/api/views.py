@@ -53,6 +53,8 @@ class UsersViewSet(UserViewSet):
             return SubscribeSerializer
         if self.action == 'subscriptions':
             return SubscriptionsSerializer
+        if self.action == 'set_password':
+            return SetPasswordSerializer
         if self.request.method == 'POST':
             return UserSignUpSerializer
         return UserDisplaySerializer
@@ -65,24 +67,20 @@ class UsersViewSet(UserViewSet):
     def get_instance(self):
         return self.request.user
 
-    @action(['post', 'delete'], detail=True)
-    def subscribe(self, request, pk):
+    @action(['post'], detail=True)
+    def subscribe(self, request, id):
         if self.request.method == 'POST':
             user = self.request.user
-            subscription = get_object_or_404(User, pk=pk)
-            if subscription == user:
-                raise ValidationError('Нельзя подписываться на себя.')
-            if Subscription.objects.filter(
-                user=user, subscription=subscription
-            ).exists():
-                raise ValidationError(
-                    'Нельзя повторно подписываться на одного пользователя.'
-                )
+            subscription = get_object_or_404(User, id=id)
+            request.data['id'] = id
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save(user=user, subscription=subscription)
             return Response(serializer.data, status=HTTP_201_CREATED)
-        instance = get_many_to_many_instance(request, pk, Subscription)
+        
+    @subscribe.mapping.delete
+    def delete_subscribe(self, request, id):
+        instance = get_many_to_many_instance(request, id, Subscription)
         instance.delete()
         return Response(status=HTTP_204_NO_CONTENT)
 
@@ -143,24 +141,32 @@ class RecipeViewSet(ModelViewSet):
         return super().get_permissions()
 
     def create_shopping_cart_txt(self, request):
-        ingredients = ShoppingCart.objects.filter(user=request.user).values('shopping_cart__ingredients')
+        recipes_list = ShoppingCart.objects.filter(
+            user=request.user
+        ).values_list('shopping_cart')
+        ingredients = (
+            RecipeIngredient.objects.filter(
+                recipe__in=recipes_list
+            ).annotate(total_amount=Sum('amount')).values_list(
+                'ingredient__name',
+                'total_amount',
+                'ingredient__measurement_unit'
+            ).order_by('ingredient__name',)
+        )
 
         with open(
             f'data/{request.user}_shopping_cart.txt', 'w'
         ) as f:
             f.write('Список ингредиентов: \n')
-            for ingredient in ingredients.keys():
-                name_unit = ingredient.split(',')
-                row = (
-                    f'{name_unit[0]}: {ingredients[ingredient]} '
-                    f'{name_unit[1]} \n'
-                )
-                f.write(row)
+            for ingredient in ingredients:
+                f.write(f'{ingredient[0]}: {ingredient[1]} '
+                    f'{ingredient[2]} \n')
         return f'data/{request.user}_shopping_cart.txt'
 
     @action(['post'], detail=True)
     def favorite(self, request, pk):
         if self.request.method == 'POST':
+            request.data['pk'] = pk
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save(
@@ -178,6 +184,7 @@ class RecipeViewSet(ModelViewSet):
     @action(['post'], detail=True)
     def shopping_cart(self, request, pk):
         if self.request.method == 'POST':
+            request.data['pk'] = pk
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save(

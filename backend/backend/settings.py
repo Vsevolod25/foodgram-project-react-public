@@ -7,7 +7,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', get_random_secret_key())
 
-DEBUG = os.getenv('DEBUG', False) == 'True'
+DEBUG = True
+
+# DEBUG = os.getenv('DEBUG', False) == 'True'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(', ')
 
@@ -60,6 +62,7 @@ REST_FRAMEWORK = {
 DJOSER = {
     'LOGIN_FIELD': 'email',
     'PERMISSIONS': {
+        'user': ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
         'user_list': ['rest_framework.permissions.IsAuthenticatedOrReadOnly'],
     },
     'SERIALIZERS': {
@@ -86,30 +89,37 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-SQLITE_BOOL = os.getenv('SQLITE', False) == 'True'
+#SQLITE_BOOL = os.getenv('SQLITE', False) == 'True'
 
-DATABASES_DICT = {
+#DATABASES_DICT = {
+#
+#    True: {
+#        'default': {
+#            'ENGINE': 'django.db.backends.sqlite3',
+#            'NAME': BASE_DIR / 'db.sqlite3',
+#        }
+#    },
+#
+#    False: {
+#        'default': {
+#            'ENGINE': 'django.db.backends.postgresql',
+#            'NAME': os.getenv('POSTGRES_DB', 'foodgram'),
+#            'USER': os.getenv('POSTGRES_USER', 'foodgram_user'),
+#            'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
+#            'HOST': os.getenv('DB_HOST', ''),
+#            'PORT': os.getenv('DB_PORT', 5432),
+#       }
+#    }
+#}
 
-    True: {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    },
-
-    False: {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('POSTGRES_DB', 'foodgram'),
-            'USER': os.getenv('POSTGRES_USER', 'foodgram_user'),
-            'PASSWORD': os.getenv('POSTGRES_PASSWORD', ''),
-            'HOST': os.getenv('DB_HOST', ''),
-            'PORT': os.getenv('DB_PORT', 5432),
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
-DATABASES = DATABASES_DICT[SQLITE_BOOL]
+# DATABASES = DATABASES_DICT[SQLITE_BOOL]
 
 AUTH_USER_MODEL = 'users.User'
 
