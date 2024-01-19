@@ -3,10 +3,14 @@ from django.db import models
 
 from backend.constants import (
     MAX_COOKING_TIME,
+    MAX_COOKING_TIME_ERR,
     MAX_FIELD_LENGTH,
     MAX_INGREDIENT_AMOUNT,
+    MAX_INGREDIENT_AMOUNT_ERR,
     MIN_COOKING_TIME,
-    MIN_INGREDIENT_AMOUNT
+    MIN_COOKING_TIME_ERR,
+    MIN_INGREDIENT_AMOUNT,
+    MIN_INGREDIENT_AMOUNT_ERR
 )
 from ingredients.models import Ingredient
 from tags.models import Tag
@@ -23,14 +27,8 @@ class Recipe(models.Model):
     text = models.TextField(verbose_name='описание')
     cooking_time = models.PositiveSmallIntegerField(
         validators=[
-            MinValueValidator(
-                MIN_COOKING_TIME,
-                message='Время приготовления не может быть меньше 1.'
-            ),
-            MaxValueValidator(
-                MAX_COOKING_TIME,
-                message='Время приготовления не может быть больше 32000.'
-            )
+            MinValueValidator(MIN_COOKING_TIME, message=MIN_COOKING_TIME_ERR),
+            MaxValueValidator(MAX_COOKING_TIME, message=MAX_COOKING_TIME_ERR)
         ],
         verbose_name='время приготовления'
     )
@@ -71,6 +69,7 @@ class RecipeIngredient(models.Model):
         Recipe,
         on_delete=models.CASCADE,
         null=True,
+        related_name='recipe_ingredient',
         verbose_name='рецепт'
     )
     ingredient = models.ForeignKey(
@@ -83,12 +82,10 @@ class RecipeIngredient(models.Model):
         default=1,
         validators=[
             MinValueValidator(
-                MIN_INGREDIENT_AMOUNT,
-                message='Объем ингредиента не может быть меньше 1.'
+                MIN_INGREDIENT_AMOUNT, message=MIN_INGREDIENT_AMOUNT_ERR
             ),
             MaxValueValidator(
-                MAX_INGREDIENT_AMOUNT,
-                message='Объем ингредиента не может быть больше 32000.'
+                MAX_INGREDIENT_AMOUNT, message=MAX_INGREDIENT_AMOUNT_ERR
             )
         ],
         verbose_name='количество ингредиента'
@@ -133,7 +130,7 @@ class Favorite(models.Model):
         related_name='favorites_user',
         verbose_name='пользователь'
     )
-    favorite = models.ForeignKey(
+    recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
         related_name='favorites',
@@ -144,15 +141,15 @@ class Favorite(models.Model):
         constraints = (
             models.UniqueConstraint(
                 name='unique_recipes_in_favorite',
-                fields=('user', 'favorite')
+                fields=('user', 'recipe')
             ),
         )
-        ordering = ('favorite',)
+        ordering = ('recipe',)
         verbose_name = 'Избранный рецепт'
         verbose_name_plural = 'Избранные рецепты'
 
     def __str__(self):
-        return self.favorite
+        return self.recipe
 
 
 class ShoppingCart(models.Model):
@@ -162,7 +159,7 @@ class ShoppingCart(models.Model):
         related_name='shopping_cart_user',
         verbose_name='пользователь'
     )
-    shopping_cart = models.ForeignKey(
+    recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
         related_name='shopping_cart',
@@ -173,7 +170,7 @@ class ShoppingCart(models.Model):
         constraints = (
             models.UniqueConstraint(
                 name='unique_recipes_in_shopping_cart',
-                fields=('user', 'shopping_cart')
+                fields=('user', 'recipe')
             ),
         )
         ordering = ('user',)
@@ -181,4 +178,4 @@ class ShoppingCart(models.Model):
         verbose_name_plural = 'Рецепты в корзинах'
 
     def __str__(self):
-        return self.shopping_cart
+        return self.recipe

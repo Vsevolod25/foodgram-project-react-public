@@ -65,12 +65,14 @@ class UsersViewSet(UserViewSet):
 
     @action(['post'], detail=True)
     def subscribe(self, request, id):
-        user = self.request.user
-        subscription = get_object_or_404(User, id=id)
-        request.data['id'] = id
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.get_serializer(
+            data={
+                'user': self.request.user.id,
+                'subscription': get_object_or_404(User, id=id).id
+            }
+        )
         serializer.is_valid(raise_exception=True)
-        serializer.save(user=user, subscription=subscription)
+        serializer.save()
         return Response(serializer.data, status=HTTP_201_CREATED)
 
     @subscribe.mapping.delete
@@ -122,11 +124,12 @@ class RecipeViewSet(ModelViewSet):
     def create_shopping_cart_txt(self, request):
         recipes_list = ShoppingCart.objects.filter(
             user=request.user
-        ).values_list('shopping_cart')
+        ).values_list('recipe')
         ingredients = (
             RecipeIngredient.objects.filter(
                 recipe__in=recipes_list
-            ).annotate(total_amount=Sum('amount')).values_list(
+            ).values('ingredient').annotate(total_amount=Sum('amount'))
+            .values_list(
                 'ingredient__name',
                 'total_amount',
                 'ingredient__measurement_unit'
@@ -145,13 +148,14 @@ class RecipeViewSet(ModelViewSet):
 
     @action(['post'], detail=True)
     def favorite(self, request, pk):
-        request.data['pk'] = pk
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save(
-            user=self.request.user,
-            favorite=Recipe.objects.get(id=pk)
+        serializer = self.get_serializer(
+            data={
+                'user': self.request.user.id,
+                'recipe': pk
+            }
         )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response(serializer.data, status=HTTP_201_CREATED)
 
     @favorite.mapping.delete
@@ -162,13 +166,14 @@ class RecipeViewSet(ModelViewSet):
 
     @action(['post'], detail=True)
     def shopping_cart(self, request, pk):
-        request.data['pk'] = pk
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save(
-            user=self.request.user,
-            shopping_cart=Recipe.objects.get(id=pk)
+        serializer = self.get_serializer(
+            data={
+                'user': self.request.user.id,
+                'recipe': pk
+            }
         )
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
         return Response(serializer.data, status=HTTP_201_CREATED)
 
     @shopping_cart.mapping.delete

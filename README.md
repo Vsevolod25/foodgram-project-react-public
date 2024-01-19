@@ -12,5 +12,5 @@ https://foodgram-vs.ddns.net
 
 ## Superuser (для входа в админку)
 
-login: user
+email: user@me.com
 password: user

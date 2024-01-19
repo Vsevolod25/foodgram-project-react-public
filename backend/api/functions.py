@@ -13,8 +13,8 @@ MODELS_DEPENDENCY_DICT = {
 
 MODELS_FIELDS_DICT = {
     Subscription: 'subscription',
-    Favorite: 'favorite',
-    ShoppingCart: 'shopping_cart'
+    Favorite: 'recipe',
+    ShoppingCart: 'recipe'
 }
 
 ERRORS_NOT_EXISTS_DICT = {
