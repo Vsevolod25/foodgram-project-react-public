@@ -100,19 +100,19 @@ class RecipeViewSet(ModelViewSet):
             return ShoppingCart.objects.all()
         queryset = Recipe.objects.all()
         request = self.request
-        if request.user.is_authenticated: 
-            is_in_shopping_cart = self.request.query_params.get( 
-                'is_in_shopping_cart' 
-            ) 
-            if is_in_shopping_cart is not None: 
-                return queryset.filter( 
-                    id__in=get_many_to_many_list(request, ShoppingCart) 
-                ) 
-            is_favorited = self.request.query_params.get('is_favorited') 
-            if is_favorited is not None: 
-                queryset = queryset.filter( 
-                    id__in=get_many_to_many_list(request, Favorite) 
-                )  
+        if request.user.is_authenticated:
+            is_in_shopping_cart = self.request.query_params.get(
+                'is_in_shopping_cart'
+            )
+            if is_in_shopping_cart is not None:
+                return queryset.filter(
+                    id__in=get_many_to_many_list(request, ShoppingCart)
+                )
+            is_favorited = self.request.query_params.get('is_favorited')
+            if is_favorited is not None:
+                queryset = queryset.filter(
+                    id__in=get_many_to_many_list(request, Favorite)
+                )
         author = self.request.query_params.get('author')
         if author:
             queryset = queryset.filter(author=author)

@@ -2,7 +2,6 @@ from django_filters import CharFilter, filters, FilterSet
 
 from ingredients.models import Ingredient
 from recipes.models import Favorite, Recipe, ShoppingCart
-from .functions import get_many_to_many_list
 
 
 class IngredientFilter(FilterSet):
