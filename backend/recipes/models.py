@@ -3,14 +3,10 @@ from django.db import models
 
 from backend.constants import (
     MAX_COOKING_TIME,
-    MAX_COOKING_TIME_ERR,
     MAX_FIELD_LENGTH,
     MAX_INGREDIENT_AMOUNT,
-    MAX_INGREDIENT_AMOUNT_ERR,
     MIN_COOKING_TIME,
-    MIN_COOKING_TIME_ERR,
-    MIN_INGREDIENT_AMOUNT,
-    MIN_INGREDIENT_AMOUNT_ERR
+    MIN_INGREDIENT_AMOUNT
 )
 from ingredients.models import Ingredient
 from tags.models import Tag
@@ -27,8 +23,20 @@ class Recipe(models.Model):
     text = models.TextField(verbose_name='описание')
     cooking_time = models.PositiveSmallIntegerField(
         validators=[
-            MinValueValidator(MIN_COOKING_TIME, message=MIN_COOKING_TIME_ERR),
-            MaxValueValidator(MAX_COOKING_TIME, message=MAX_COOKING_TIME_ERR)
+            MinValueValidator(
+                MIN_COOKING_TIME,
+                message=(
+                    'Время приготовления не может быть '
+                    f'меньше {MIN_COOKING_TIME}.'
+                )
+            ),
+            MaxValueValidator(
+                MAX_COOKING_TIME,
+                message=(
+                    'Время приготовления не может быть '
+                    f'больше {MAX_COOKING_TIME}.'
+                )
+            )
         ],
         verbose_name='время приготовления'
     )
@@ -82,10 +90,18 @@ class RecipeIngredient(models.Model):
         default=1,
         validators=[
             MinValueValidator(
-                MIN_INGREDIENT_AMOUNT, message=MIN_INGREDIENT_AMOUNT_ERR
+                MIN_INGREDIENT_AMOUNT,
+                message=(
+                    'Объем ингредиента не может быть '
+                    f'меньше {MIN_INGREDIENT_AMOUNT}.'
+                )
             ),
             MaxValueValidator(
-                MAX_INGREDIENT_AMOUNT, message=MAX_INGREDIENT_AMOUNT_ERR
+                MAX_INGREDIENT_AMOUNT,
+                message=(
+                    'Объем ингредиента не может быть '
+                    f'больше {MAX_INGREDIENT_AMOUNT}.'
+                )
             )
         ],
         verbose_name='количество ингредиента'

@@ -16,7 +16,7 @@ from recipes.models import Favorite, Recipe, RecipeIngredient, ShoppingCart
 from tags.models import Tag
 from users.models import Subscription, User
 from .filters import IngredientFilter, RecipeFilter
-from .functions import get_many_to_many_instance
+from .functions import get_many_to_many_instance, get_many_to_many_list
 from .mixins import ListRetrieveViewSet
 from .permissions import IsAuthorOrReadOnly
 from .serializers import (
@@ -87,6 +87,7 @@ class UsersViewSet(UserViewSet):
 
 
 class RecipeViewSet(ModelViewSet):
+    queryset = Recipe.objects.all()
     http_method_names = ('get', 'head', 'post', 'patch', 'delete')
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
@@ -98,6 +99,20 @@ class RecipeViewSet(ModelViewSet):
         if self.action in ('shopping_cart', 'download_shopping_cart'):
             return ShoppingCart.objects.all()
         queryset = Recipe.objects.all()
+        request = self.request
+        if request.user.is_authenticated: 
+            is_in_shopping_cart = self.request.query_params.get( 
+                'is_in_shopping_cart' 
+            ) 
+            if is_in_shopping_cart is not None: 
+                return queryset.filter( 
+                    id__in=get_many_to_many_list(request, ShoppingCart) 
+                ) 
+            is_favorited = self.request.query_params.get('is_favorited') 
+            if is_favorited is not None: 
+                queryset = queryset.filter( 
+                    id__in=get_many_to_many_list(request, Favorite) 
+                )  
         author = self.request.query_params.get('author')
         if author:
             queryset = queryset.filter(author=author)

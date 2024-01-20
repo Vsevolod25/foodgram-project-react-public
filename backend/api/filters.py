@@ -28,14 +28,14 @@ class RecipeFilter(FilterSet):
 
     def filter_is_favorited(self, queryset, name, value):
         if value and self.request.user.is_authenticated:
-            return queryset.filter(
-                id__in=get_many_to_many_list(self.request, Favorite)
-            )
+            return Favorite.objects.filter(
+                user=self.request.user
+            ).values('recipe')
         return queryset
 
     def filter_is_in_shopping_cart(self, queryset, name, value):
         if value and self.request.user.is_authenticated:
-            return queryset.filter(
-                id__in=get_many_to_many_list(self.request, ShoppingCart)
-            )
+            return ShoppingCart.objects.filter(
+                user=self.request.user
+            ).values('recipe')
         return queryset

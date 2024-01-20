@@ -6,9 +6,7 @@ from rest_framework.exceptions import ValidationError
 
 from backend.constants import (
     MAX_INGREDIENT_AMOUNT,
-    MAX_INGREDIENT_AMOUNT_ERR,
-    MIN_INGREDIENT_AMOUNT,
-    MIN_INGREDIENT_AMOUNT_ERR
+    MIN_INGREDIENT_AMOUNT
 )
 from ingredients.models import Ingredient
 from recipes.models import (
@@ -143,10 +141,18 @@ class RecipeCreateIngredientSerializer(serializers.ModelSerializer):
     amount = serializers.IntegerField(
         validators=[
             MinValueValidator(
-                MIN_INGREDIENT_AMOUNT, message=MIN_INGREDIENT_AMOUNT_ERR
+                MIN_INGREDIENT_AMOUNT,
+                message=(
+                    'Объем ингредиента не может быть '
+                    f'меньше {MIN_INGREDIENT_AMOUNT}.'
+                )
             ),
             MaxValueValidator(
-                MAX_INGREDIENT_AMOUNT, message=MAX_INGREDIENT_AMOUNT_ERR
+                MAX_INGREDIENT_AMOUNT,
+                message=(
+                    'Объем ингредиента не может быть '
+                    f'больше {MAX_INGREDIENT_AMOUNT}.'
+                )
             )
         ],
     )
@@ -166,14 +172,6 @@ class RecipeDisplayIngredientSerializer(serializers.ModelSerializer):
     class Meta:
         model = RecipeIngredient
         fields = ('id', 'name', 'measurement_unit', 'amount',)
-
-    def to_representation(self, instance):
-        return {
-            'id': instance.ingredient.id,
-            'name': instance.ingredient.name,
-            'measurement_unit': instance.ingredient.measurement_unit,
-            'amount': instance.amount
-        }
 
 
 class RecipeDisplaySerializer(serializers.ModelSerializer):
