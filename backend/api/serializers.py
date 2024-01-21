@@ -8,7 +8,7 @@ from backend.constants import (
     MAX_INGREDIENT_AMOUNT,
     MIN_INGREDIENT_AMOUNT
 )
-from backend.settings import MEDIA_ROOT, MEDIA_URL
+from backend.settings import MEDIA_URL
 from ingredients.models import Ingredient
 from recipes.models import (
     Favorite, Recipe, RecipeIngredient, RecipeTag, ShoppingCart

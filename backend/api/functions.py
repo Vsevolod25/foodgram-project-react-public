@@ -5,6 +5,7 @@ from rest_framework.pagination import (
     LimitOffsetPagination, PageNumberPagination
 )
 
+from backend.settings import PAGE_SIZE
 from recipes.models import Favorite, Recipe, ShoppingCart
 from users.models import Subscription, User
 
@@ -45,8 +46,9 @@ def get_many_to_many_list(request, model):
         ] for obj in model.objects.filter(user=request.user)
     ]
 
+
 def get_pagination_class(self):
     limit = self.request.query_params.get('limit')
-    if limit and (limit!=6):
+    if limit and (limit != str(PAGE_SIZE)):
         return LimitOffsetPagination
     return PageNumberPagination
