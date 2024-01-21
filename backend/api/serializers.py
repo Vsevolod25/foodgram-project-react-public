@@ -8,6 +8,7 @@ from backend.constants import (
     MAX_INGREDIENT_AMOUNT,
     MIN_INGREDIENT_AMOUNT
 )
+from backend.settings import MEDIA_ROOT, MEDIA_URL
 from ingredients.models import Ingredient
 from recipes.models import (
     Favorite, Recipe, RecipeIngredient, RecipeTag, ShoppingCart
@@ -110,7 +111,7 @@ class SubscriptionsSerializer(serializers.ModelSerializer):
                 {
                     'id': current_recipe.id,
                     'name': current_recipe.name,
-                    'image': str(current_recipe.image),
+                    'image': self.context['request'].get_host() + MEDIA_URL + str(current_recipe.image),
                     'cooking_time': current_recipe.cooking_time
                 } for current_recipe in SubscriptionsSerializer.get_recipes(
                     self, instance

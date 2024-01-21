@@ -69,7 +69,7 @@ class Recipe(models.Model):
         return self.name
 
     def favorited_num(self):
-        return Favorite.objects.filter(favorite=self).count()
+        return Favorite.objects.filter(recipe=self).count()
 
 
 class RecipeIngredient(models.Model):

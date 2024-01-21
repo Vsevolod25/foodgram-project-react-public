@@ -7,7 +7,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.getenv('SECRET_KEY', get_random_secret_key())
 
-DEBUG = os.getenv('DEBUG', False) == 'True'
+DEBUG = True
+
+# DEBUG = os.getenv('DEBUG', False) == 'True'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(', ')
 
@@ -52,7 +54,7 @@ REST_FRAMEWORK = {
     ],
 
     'DEFAULT_PAGINATION_CLASS': [
-        'rest_framework.pagination.LimitOffsetPagination',
+        'rest_framework.pagination.PageNumberPagination',
     ],
 
     'PAGE_SIZE': 6,
@@ -111,7 +113,14 @@ DATABASES_DICT = {
     }
 }
 
-DATABASES = DATABASES_DICT[SQLITE_BOOL]
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
+# DATABASES = DATABASES_DICT[SQLITE_BOOL]
 
 AUTH_USER_MODEL = 'users.User'
 
