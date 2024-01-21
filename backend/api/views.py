@@ -15,9 +15,7 @@ from recipes.models import Favorite, Recipe, RecipeIngredient, ShoppingCart
 from tags.models import Tag
 from users.models import Subscription, User
 from .filters import IngredientFilter, RecipeFilter
-from .functions import (
-    get_many_to_many_instance, get_many_to_many_list, get_pagination_class
-)
+from .functions import get_many_to_many_instance, get_pagination_class
 from .mixins import ListRetrieveViewSet
 from .permissions import IsAuthorOrReadOnly
 from .serializers import (

@@ -72,4 +72,4 @@ jobs:
           cd foodgram/infra/
           sudo docker compose -f docker-compose.production.yml pull
           sudo docker compose -f docker-compose.production.yml down
-          sudo docker compose -f docker-compose.production.yml up
+          sudo docker compose -f docker-compose.production.yml up -d
