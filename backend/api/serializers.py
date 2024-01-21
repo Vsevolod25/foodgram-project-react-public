@@ -111,7 +111,10 @@ class SubscriptionsSerializer(serializers.ModelSerializer):
                 {
                     'id': current_recipe.id,
                     'name': current_recipe.name,
-                    'image': self.context['request'].get_host() + MEDIA_URL + str(current_recipe.image),
+                    'image': (
+                        f'http://{self.context["request"].get_host()}'
+                        f'{MEDIA_URL}{str(current_recipe.image)}'
+                    ),
                     'cooking_time': current_recipe.cooking_time
                 } for current_recipe in SubscriptionsSerializer.get_recipes(
                     self, instance

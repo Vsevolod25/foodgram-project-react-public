@@ -113,7 +113,14 @@ DATABASES_DICT = {
     }
 }
 
-DATABASES = DATABASES_DICT[SQLITE_BOOL]
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
+# DATABASES = DATABASES_DICT[SQLITE_BOOL]
 
 AUTH_USER_MODEL = 'users.User'
 

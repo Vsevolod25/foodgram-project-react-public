@@ -5,7 +5,9 @@ from django.shortcuts import get_object_or_404
 from djoser.serializers import SetPasswordSerializer
 from djoser.views import UserViewSet
 from rest_framework.decorators import action
-from rest_framework.pagination import PageNumberPagination
+from rest_framework.pagination import (
+    LimitOffsetPagination, PageNumberPagination
+)
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED, HTTP_204_NO_CONTENT
@@ -60,9 +62,6 @@ class UsersViewSet(UserViewSet):
             self.permission_classes = (IsAuthenticated,)
         return super().get_permissions()
 
-    def get_instance(self):
-        return self.request.user
-
     @action(['post'], detail=True)
     def subscribe(self, request, id):
         serializer = self.get_serializer(
@@ -91,7 +90,6 @@ class RecipeViewSet(ModelViewSet):
     http_method_names = ('get', 'head', 'post', 'patch', 'delete')
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
-    pagination_class = PageNumberPagination
 
     def get_queryset(self):
         if self.action == 'favorite':
@@ -116,12 +114,6 @@ class RecipeViewSet(ModelViewSet):
         author = self.request.query_params.get('author')
         if author:
             queryset = queryset.filter(author=author)
-        limit = self.request.query_params.get('limit')
-        if limit:
-            try:
-                return queryset.order_by('-pub_date', 'name')[:int(limit)]
-            except ValueError:
-                pass
         return queryset.order_by('-pub_date', 'name')
 
     def get_serializer_class(self):
@@ -141,6 +133,12 @@ class RecipeViewSet(ModelViewSet):
         else:
             self.permission_classes = (IsAuthorOrReadOnly,)
         return super().get_permissions()
+
+    def get_pagination_class(self):
+        limit = self.request.query_params.get('limit')
+        if limit:
+            return LimitOffsetPagination
+        return PageNumberPagination
 
     def create_shopping_cart_txt(self, request):
         recipes_list = ShoppingCart.objects.filter(
