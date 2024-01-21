@@ -96,25 +96,7 @@ class RecipeViewSet(ModelViewSet):
             return Favorite.objects.all()
         if self.action in ('shopping_cart', 'download_shopping_cart'):
             return ShoppingCart.objects.all()
-        queryset = Recipe.objects.all()
-        request = self.request
-        if request.user.is_authenticated:
-            is_in_shopping_cart = self.request.query_params.get(
-                'is_in_shopping_cart'
-            )
-            if is_in_shopping_cart is not None:
-                return queryset.filter(
-                    id__in=get_many_to_many_list(request, ShoppingCart)
-                )
-            is_favorited = self.request.query_params.get('is_favorited')
-            if is_favorited is not None:
-                queryset = queryset.filter(
-                    id__in=get_many_to_many_list(request, Favorite)
-                )
-        author = self.request.query_params.get('author')
-        if author:
-            queryset = queryset.filter(author=author)
-        return queryset.order_by('-pub_date', 'name')
+        return Recipe.objects.order_by('-pub_date', 'name')
 
     def get_serializer_class(self):
         if self.action == 'favorite':
