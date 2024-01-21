@@ -1,6 +1,9 @@
 from django.forms.models import model_to_dict
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import ValidationError
+from rest_framework.pagination import (
+    LimitOffsetPagination, PageNumberPagination
+)
 
 from recipes.models import Favorite, Recipe, ShoppingCart
 from users.models import Subscription, User
@@ -41,3 +44,9 @@ def get_many_to_many_list(request, model):
             MODELS_FIELDS_DICT[model]
         ] for obj in model.objects.filter(user=request.user)
     ]
+
+def get_pagination_class(self):
+    limit = self.request.query_params.get('limit')
+    if limit:
+        return LimitOffsetPagination
+    return PageNumberPagination

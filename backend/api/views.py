@@ -18,7 +18,9 @@ from recipes.models import Favorite, Recipe, RecipeIngredient, ShoppingCart
 from tags.models import Tag
 from users.models import Subscription, User
 from .filters import IngredientFilter, RecipeFilter
-from .functions import get_many_to_many_instance, get_many_to_many_list
+from .functions import (
+    get_many_to_many_instance, get_many_to_many_list, get_pagination_class
+)
 from .mixins import ListRetrieveViewSet
 from .permissions import IsAuthorOrReadOnly
 from .serializers import (
@@ -37,7 +39,7 @@ from .serializers import (
 
 class UsersViewSet(UserViewSet):
     http_method_names = ('get', 'head', 'post', 'delete')
-    pagination_class = PageNumberPagination
+    pagination_class = property(fget=get_pagination_class)
 
     def get_queryset(self):
         if self.action == 'subscribe':
@@ -90,6 +92,7 @@ class RecipeViewSet(ModelViewSet):
     http_method_names = ('get', 'head', 'post', 'patch', 'delete')
     filter_backends = (DjangoFilterBackend,)
     filterset_class = RecipeFilter
+    pagination_class = property(fget=get_pagination_class)
 
     def get_queryset(self):
         if self.action == 'favorite':
@@ -133,12 +136,6 @@ class RecipeViewSet(ModelViewSet):
         else:
             self.permission_classes = (IsAuthorOrReadOnly,)
         return super().get_permissions()
-
-    def get_pagination_class(self):
-        limit = self.request.query_params.get('limit')
-        if limit:
-            return LimitOffsetPagination
-        return PageNumberPagination
 
     def create_shopping_cart_txt(self, request):
         recipes_list = ShoppingCart.objects.filter(
