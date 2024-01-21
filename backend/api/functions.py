@@ -47,6 +47,6 @@ def get_many_to_many_list(request, model):
 
 def get_pagination_class(self):
     limit = self.request.query_params.get('limit')
-    if limit:
+    if limit and (limit!=6):
         return LimitOffsetPagination
     return PageNumberPagination
